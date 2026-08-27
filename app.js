@@ -113,7 +113,7 @@ async function loadResources() {
     allResources = data || [];
     // Keep results sorted the way the old .order() calls did, since rpc()
     // doesn't chain .order() the way .from().select() did.
-    allResources.sort((a, b) => (a.sort_order - b.sort_order) || (new Date(a.created_at) - new Date(b.created_at)));
+    allResources.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
     if (resultsRevealed) {
       renderResources(currentFiltered());
     } else {
