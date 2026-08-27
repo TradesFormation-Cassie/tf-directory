@@ -16,7 +16,7 @@ body{
   color:var(--ink);
   background:var(--paper);
 }
-h1,h2,h3,.hero__title,.results__header h2,.modal h3{
+.hero__title,.results__header h2,.modal h3{
   font-family:'Anton',sans-serif;
   font-weight:400;
 }
@@ -160,6 +160,14 @@ h1,h2,h3,.hero__title,.results__header h2,.modal h3{
   font-family:'Poppins',sans-serif;font-size:15px;outline:none;margin-top:6px;
 }
 .modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--ink);}
+.password-field{position:relative;}
+.password-field input{padding-right:44px;}
+.password-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;
+}
+.password-toggle:hover{color:var(--ink);background:var(--panel);}
 .modal label{display:block;font-size:13px;font-weight:700;margin-bottom:14px;color:var(--ink);}
 .modal__row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .modal__optional{font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;}
