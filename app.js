@@ -56,6 +56,42 @@ const ICON_LABELS = {
 
 let allResources = [];
 let editingId = null; // null = add mode, otherwise the resource id being edited
+let currentKeywords = [];
+
+function renderKeywordChips() {
+  $("keywordChips").innerHTML = currentKeywords.map((k, i) => `
+    <span class="keyword-chip">${escapeHtml(k)}<button type="button" data-remove-keyword="${i}" aria-label="Remove ${escapeAttr(k)}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+    </button></span>
+  `).join("");
+  $("keywordChips").querySelectorAll("[data-remove-keyword]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentKeywords.splice(Number(btn.dataset.removeKeyword), 1);
+      renderKeywordChips();
+    });
+  });
+}
+
+function addKeywordFromInput() {
+  const input = $("fieldKeywordInput");
+  const val = input.value.trim();
+  if (!val) return;
+  const alreadyExists = currentKeywords.some(k => k.toLowerCase() === val.toLowerCase());
+  if (!alreadyExists) {
+    currentKeywords.push(val);
+    renderKeywordChips();
+  }
+  input.value = "";
+  input.focus();
+}
+
+$("addKeywordBtn").addEventListener("click", addKeywordFromInput);
+$("fieldKeywordInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addKeywordFromInput();
+  }
+});
 
 const $ = (id) => document.getElementById(id);
 
@@ -158,7 +194,8 @@ function currentFiltered() {
   return allResources.filter(r =>
     r.name.toLowerCase().includes(q) ||
     r.description.toLowerCase().includes(q) ||
-    r.category.toLowerCase().includes(q)
+    r.category.toLowerCase().includes(q) ||
+    (Array.isArray(r.keywords) && r.keywords.some(k => k.toLowerCase().includes(q)))
   );
 }
 
@@ -312,6 +349,9 @@ function openResourceModal(id) {
     $("fieldToolPassword").value = r.tool_password || "";
     $("fieldInternal").checked = !!r.is_internal_only;
     $("fieldClientSafe").checked = !!r.is_client_safe;
+    currentKeywords = Array.isArray(r.keywords) ? [...r.keywords] : [];
+    $("fieldKeywordInput").value = "";
+    renderKeywordChips();
     $("deleteResourceBtn").hidden = false;
   } else {
     $("resourceModalTitle").textContent = "Add a Resource";
@@ -319,6 +359,8 @@ function openResourceModal(id) {
     $("fieldIcon").value = "link";
     $("fieldInternal").checked = false;
     $("fieldClientSafe").checked = false;
+    currentKeywords = [];
+    renderKeywordChips();
     $("deleteResourceBtn").hidden = true;
   }
   $("resourceOverlay").hidden = false;
@@ -343,7 +385,8 @@ $("resourceForm").addEventListener("submit", async (e) => {
     p_tool_username: $("fieldUsername").value.trim() || null,
     p_tool_password: $("fieldToolPassword").value.trim() || null,
     p_is_internal_only: $("fieldInternal").checked,
-    p_is_client_safe: $("fieldClientSafe").checked
+    p_is_client_safe: $("fieldClientSafe").checked,
+    p_keywords: currentKeywords
   };
 
   $("saveResourceBtn").disabled = true;
