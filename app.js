@@ -129,7 +129,7 @@ async function loadResources() {
 let resultsRevealed = false;
 
 function showBrowsePrompt() {
-  document.querySelector(".results").classList.add("is-collapsed");
+  document.querySelector(".results").hidden = true;
   $("cardList").innerHTML = "";
   $("emptyState").hidden = true;
   $("resultsCount").textContent = "";
@@ -163,7 +163,7 @@ function currentFiltered() {
 }
 
 function renderResources(list) {
-  document.querySelector(".results").classList.remove("is-collapsed");
+  document.querySelector(".results").hidden = false;
   const container = $("cardList");
   const empty = $("emptyState");
   const count = $("resultsCount");
