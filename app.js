@@ -114,13 +114,40 @@ async function loadResources() {
     }
 
     allResources = data || [];
-    renderResources(allResources);
+    if (resultsRevealed) {
+      renderResources(currentFiltered());
+    } else {
+      showBrowsePrompt();
+    }
     renderSuggestedTerms();
   } catch (err) {
     $("resultsCount").textContent = `Something went wrong loading resources: ${err.message}`;
     console.error("Unexpected error loading resources:", err);
   }
 }
+
+let resultsRevealed = false;
+
+function showBrowsePrompt() {
+  $("cardList").innerHTML = "";
+  $("emptyState").hidden = true;
+  const n = allResources.length;
+  $("resultsCount").textContent = n
+    ? `${n} tool${n === 1 ? "" : "s"} — click "Browse All Tools" or start typing to search`
+    : "No tools yet";
+}
+
+function revealAllResources() {
+  resultsRevealed = true;
+  $("searchInput").value = "";
+  $("clearSearch").hidden = true;
+  renderResources(allResources);
+  document.querySelector(".results").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.querySelectorAll(".browse-all-btn").forEach(btn => {
+  btn.addEventListener("click", revealAllResources);
+});
 
 function renderSuggestedTerms() {
   const terms = ["Group Coaching Calendar", "Objections Playbook", "Coaching Packages"];
@@ -199,12 +226,21 @@ function escapeAttr(str) {
 // ---------- Search ----------
 $("searchInput").addEventListener("input", () => {
   $("clearSearch").hidden = $("searchInput").value.length === 0;
-  renderResources(currentFiltered());
+  if ($("searchInput").value.trim().length > 0) resultsRevealed = true;
+  if (resultsRevealed) {
+    renderResources(currentFiltered());
+  } else {
+    showBrowsePrompt();
+  }
 });
 $("clearSearch").addEventListener("click", () => {
   $("searchInput").value = "";
   $("clearSearch").hidden = true;
-  renderResources(currentFiltered());
+  if (resultsRevealed) {
+    renderResources(currentFiltered());
+  } else {
+    showBrowsePrompt();
+  }
 });
 
 // ---------- God Mode button / password modal ----------
