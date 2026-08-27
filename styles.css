@@ -43,6 +43,9 @@ h1,h2,h3,.hero__title,.results__header h2,.modal h3{
 .btn--dark:hover{opacity:0.85;}
 .btn--ghost-dark{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.35);}
 .btn--ghost-dark:hover{border-color:#fff;}
+.btn--icon-only{
+  padding:11px;width:42px;height:42px;justify-content:center;
+}
 .btn--outline{background:#fff;color:var(--ink);border:1px solid var(--line);}
 .btn--outline:hover{border-color:var(--ink);}
 .btn--danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}

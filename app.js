@@ -4,7 +4,14 @@
 const SUPABASE_URL = "https://vgqbdusrkwhdwkpuasvn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3bxbelgI-B2RPfnKn07Kfg_7O3N2B8O";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Guarded on purpose: if this throws (CDN hiccup, bad key, offline, etc.)
+// the rest of the page — search, God Mode, every button — must still work.
+let supabase = null;
+try {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (err) {
+  console.error("Supabase failed to initialize:", err);
+}
 
 // Icon key -> inline SVG (stroke style, matches the card icon squares)
 const ICONS = {
@@ -68,17 +75,27 @@ function exitGodMode() {
 function updateGodModeUI() {
   const btn = $("godModeBtn");
   const addBtn = $("addResourceBtn");
+  const bolt = '<svg width="18" height="18" viewBox="0 0 24 24" fill="ACTIVE_FILL" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>';
   if (isGodMode()) {
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path><path d="m9 15 2 2 4-4"></path></svg> God Mode: On`;
+    btn.innerHTML = bolt.replace("ACTIVE_FILL", "currentColor");
+    btn.title = "God Mode: On (click to exit)";
+    btn.setAttribute("aria-label", "God Mode: On");
     addBtn.hidden = false;
   } else {
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> God Mode`;
+    btn.innerHTML = bolt.replace("ACTIVE_FILL", "none");
+    btn.title = "God Mode";
+    btn.setAttribute("aria-label", "God Mode");
     addBtn.hidden = true;
   }
 }
 
 // ---------- Fetch + render ----------
 async function loadResources() {
+  if (!supabase) {
+    $("resultsCount").textContent = "Couldn't connect — try refreshing the page";
+    return;
+  }
+
   const { data, error } = await supabase
     .from("resources")
     .select("*")
@@ -251,6 +268,13 @@ function openResourceModal(id) {
 
 $("resourceForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  if (!supabase) {
+    $("resourceError").textContent = "Not connected to the database right now — try refreshing.";
+    $("resourceError").hidden = false;
+    return;
+  }
+
   const payload = {
     p_password: godPassword(),
     p_name: $("fieldName").value.trim(),
@@ -285,6 +309,12 @@ $("resourceForm").addEventListener("submit", async (e) => {
 $("deleteResourceBtn").addEventListener("click", async () => {
   if (!editingId) return;
   if (!confirm("Delete this resource? This can't be undone.")) return;
+
+  if (!supabase) {
+    $("resourceError").textContent = "Not connected to the database right now — try refreshing.";
+    $("resourceError").hidden = false;
+    return;
+  }
 
   const { error } = await supabase.rpc("gm_delete_resource", {
     p_password: godPassword(),
