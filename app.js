@@ -5,6 +5,9 @@
   if (window.__tfDirectoryLoaded) return; // guards against the script running twice
   window.__tfDirectoryLoaded = true;
 
+  // Defined first, deliberately — everything below assumes $ already exists.
+  const $ = (id) => document.getElementById(id);
+
   const SUPABASE_URL = "https://vgqbdusrkwhdwkpuasvn.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_3bxbelgI-B2RPfnKn07Kfg_7O3N2B8O";
   const SITE_PASSWORD = "TFTEAM26";
@@ -92,8 +95,6 @@ $("fieldKeywordInput").addEventListener("keydown", (e) => {
     addKeywordFromInput();
   }
 });
-
-const $ = (id) => document.getElementById(id);
 
 // ---------- God Mode state (per-tab only, via sessionStorage) ----------
 function isGodMode() {
