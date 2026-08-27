@@ -96,20 +96,26 @@ async function loadResources() {
     return;
   }
 
-  const { data, error } = await supabase
-    .from("resources")
-    .select("*")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("resources")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
 
-  if (error) {
-    $("resultsCount").textContent = "Couldn't load resources";
-    console.error(error);
-    return;
+    if (error) {
+      $("resultsCount").textContent = `Couldn't load resources: ${error.message}`;
+      console.error("Supabase error loading resources:", error);
+      return;
+    }
+
+    allResources = data || [];
+    renderResources(allResources);
+    renderSuggestedTerms();
+  } catch (err) {
+    $("resultsCount").textContent = `Something went wrong loading resources: ${err.message}`;
+    console.error("Unexpected error loading resources:", err);
   }
-  allResources = data || [];
-  renderResources(allResources);
-  renderSuggestedTerms();
 }
 
 function renderSuggestedTerms() {
