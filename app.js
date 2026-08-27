@@ -1,8 +1,12 @@
 // =========================================================
 // FILL THESE IN from Supabase > Project Settings > API
 // =========================================================
-const SUPABASE_URL = "https://vgqbdusrkwhdwkpuasvn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_3bxbelgI-B2RPfnKn07Kfg_7O3N2B8O";
+(function () {
+  if (window.__tfDirectoryLoaded) return; // guards against the script running twice
+  window.__tfDirectoryLoaded = true;
+
+  const SUPABASE_URL = "https://vgqbdusrkwhdwkpuasvn.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_3bxbelgI-B2RPfnKn07Kfg_7O3N2B8O";
 
 // Guarded on purpose: if this throws (CDN hiccup, bad key, offline, etc.)
 // the rest of the page — search, God Mode, every button — must still work.
@@ -339,3 +343,4 @@ $("deleteResourceBtn").addEventListener("click", async () => {
 // ---------- Init ----------
 updateGodModeUI();
 loadResources();
+})();
