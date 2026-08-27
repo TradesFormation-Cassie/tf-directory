@@ -7,6 +7,7 @@
 
   const SUPABASE_URL = "https://vgqbdusrkwhdwkpuasvn.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_3bxbelgI-B2RPfnKn07Kfg_7O3N2B8O";
+  const SITE_PASSWORD = "TFTEAM26";
 
 // Guarded on purpose: if this throws (CDN hiccup, bad key, offline, etc.)
 // the rest of the page — search, God Mode, every button — must still work.
@@ -101,11 +102,7 @@ async function loadResources() {
   }
 
   try {
-    const { data, error } = await supabase
-      .from("resources")
-      .select("*")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true });
+    const { data, error } = await supabase.rpc("get_resources", { p_password: SITE_PASSWORD });
 
     if (error) {
       $("resultsCount").textContent = `Couldn't load resources: ${error.message}`;
@@ -114,6 +111,9 @@ async function loadResources() {
     }
 
     allResources = data || [];
+    // Keep results sorted the way the old .order() calls did, since rpc()
+    // doesn't chain .order() the way .from().select() did.
+    allResources.sort((a, b) => (a.sort_order - b.sort_order) || (new Date(a.created_at) - new Date(b.created_at)));
     if (resultsRevealed) {
       renderResources(currentFiltered());
     } else {
@@ -131,10 +131,7 @@ let resultsRevealed = false;
 function showBrowsePrompt() {
   $("cardList").innerHTML = "";
   $("emptyState").hidden = true;
-  const n = allResources.length;
-  $("resultsCount").textContent = n
-    ? `${n} tool${n === 1 ? "" : "s"} — click "Browse All Tools" or start typing to search`
-    : "No tools yet";
+  $("resultsCount").textContent = "";
 }
 
 function revealAllResources() {
@@ -389,7 +386,55 @@ $("deleteResourceBtn").addEventListener("click", async () => {
   await loadResources();
 });
 
+// ---------- Site login gate ----------
+const SITE_ACCESS_KEY = "tf_site_access";
+
+function hasSiteAccess() {
+  return localStorage.getItem(SITE_ACCESS_KEY) === SITE_PASSWORD
+    || sessionStorage.getItem(SITE_ACCESS_KEY) === SITE_PASSWORD;
+}
+
+function grantSiteAccess(remember) {
+  sessionStorage.setItem(SITE_ACCESS_KEY, SITE_PASSWORD);
+  if (remember) {
+    localStorage.setItem(SITE_ACCESS_KEY, SITE_PASSWORD);
+  } else {
+    localStorage.removeItem(SITE_ACCESS_KEY);
+  }
+  $("siteLoginOverlay").hidden = true;
+  updateGodModeUI();
+  loadResources();
+}
+
+function submitSiteLogin() {
+  const pw = $("siteLoginPassword").value;
+  if (pw === SITE_PASSWORD) {
+    grantSiteAccess($("siteLoginRemember").checked);
+  } else {
+    $("siteLoginError").hidden = false;
+  }
+}
+
+$("siteLoginSubmit").addEventListener("click", submitSiteLogin);
+$("siteLoginPassword").addEventListener("keydown", (e) => { if (e.key === "Enter") submitSiteLogin(); });
+$("siteLoginPassword").addEventListener("input", () => { $("siteLoginError").hidden = true; });
+
+$("siteLoginToggle").addEventListener("click", () => {
+  const input = $("siteLoginPassword");
+  const showing = input.type === "text";
+  input.type = showing ? "password" : "text";
+  $("siteLoginToggle").setAttribute("aria-label", showing ? "Show password" : "Hide password");
+  $("siteLoginToggle").innerHTML = showing
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.6 18.6 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+});
+
 // ---------- Init ----------
 updateGodModeUI();
-loadResources();
+if (hasSiteAccess()) {
+  $("siteLoginOverlay").hidden = true;
+  loadResources();
+} else {
+  $("siteLoginPassword").focus();
+}
 })();

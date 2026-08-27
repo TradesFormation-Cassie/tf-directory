@@ -128,7 +128,7 @@ body{
 }
 .card__actions{display:flex;align-items:center;gap:8px;flex:none;}
 .icon-btn{
-  width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:#fff;
+  width:40px;height:40px;border-radius:999px;border:1px solid var(--line);background:#fff;
   display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);
 }
 .icon-btn:hover{border-color:var(--ink);}
@@ -155,9 +155,10 @@ body{
 .modal input[type="text"],
 .modal input[type="url"],
 .modal textarea,
-.modal select{
+.modal select,
+.site-login-card input[type="password"]{
   width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;
-  font-family:'Poppins',sans-serif;font-size:15px;outline:none;margin-top:6px;
+  font-family:'Poppins',sans-serif;font-size:16px;outline:none;margin-top:6px;
 }
 .modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--ink);}
 .password-field{position:relative;}
@@ -177,6 +178,23 @@ body{
 .modal__error{color:var(--danger);font-size:13px;margin:2px 0 10px;}
 .modal__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
 .modal__actions--split{justify-content:space-between;align-items:center;}
+
+/* ---------- Site login gate ---------- */
+.site-login-overlay{
+  position:fixed;inset:0;background:var(--ink);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.site-login-overlay[hidden]{display:none;}
+.site-login-card{
+  background:#fff;border-radius:18px;padding:36px 32px 32px;width:100%;max-width:380px;text-align:center;
+}
+.site-login-logo{height:32px;width:auto;margin:0 auto 22px;display:block;}
+.site-login-card h3{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;margin:0 0 8px;}
+.site-login-card .modal__hint{margin-bottom:20px;}
+.site-login-card .password-field{text-align:left;}
+.site-login-card .modal__error{text-align:left;}
+.site-login-remember{justify-content:flex-start;margin:14px 0 20px;}
+.site-login-submit{width:100%;justify-content:center;}
 
 @media (max-width:560px){
   .topbar__inner{padding:16px 18px;flex-wrap:wrap;gap:12px;}
