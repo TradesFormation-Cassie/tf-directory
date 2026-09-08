@@ -124,6 +124,7 @@ body{
 }
 .tag--internal{background:#fdece9;color:#b3261e;border:1px solid #f3c8c1;}
 .tag--client{background:#e9f7ee;color:#1e7a3c;border:1px solid #bfe7cd;}
+.tag--client-specific{background:#fef2e3;color:#b5590a;border:1px solid #f6d9ab;}
 
 .card__creds{display:flex;gap:8px;flex-wrap:wrap;}
 .cred-chip{

@@ -227,9 +227,10 @@ function renderResources(list) {
           <span class="badge">${escapeHtml(r.category)}</span>
         </div>
         <p class="card__desc">${escapeHtml(r.description)}</p>
-        ${(r.is_internal_only || r.is_client_safe) ? `<div class="card__tags">
+        ${(r.is_internal_only || r.is_client_safe || r.is_client_specific) ? `<div class="card__tags">
           ${r.is_internal_only ? '<span class="tag tag--internal">Internal use only</span>' : ""}
           ${r.is_client_safe ? '<span class="tag tag--client">Safe to send to clients</span>' : ""}
+          ${r.is_client_specific ? '<span class="tag tag--client-specific">Client-specific</span>' : ""}
         </div>` : ""}
         ${(r.tool_username || r.tool_password) ? `<div class="card__creds">
           ${r.tool_username ? `<span class="cred-chip">User: ${escapeHtml(r.tool_username)}</span>` : ""}
@@ -350,6 +351,7 @@ function openResourceModal(id) {
     $("fieldToolPassword").value = r.tool_password || "";
     $("fieldInternal").checked = !!r.is_internal_only;
     $("fieldClientSafe").checked = !!r.is_client_safe;
+    $("fieldClientSpecific").checked = !!r.is_client_specific;
     currentKeywords = Array.isArray(r.keywords) ? [...r.keywords] : [];
     $("fieldKeywordInput").value = "";
     renderKeywordChips();
@@ -360,6 +362,7 @@ function openResourceModal(id) {
     $("fieldIcon").value = "link";
     $("fieldInternal").checked = false;
     $("fieldClientSafe").checked = false;
+    $("fieldClientSpecific").checked = false;
     currentKeywords = [];
     renderKeywordChips();
     $("deleteResourceBtn").hidden = true;
@@ -387,6 +390,7 @@ $("resourceForm").addEventListener("submit", async (e) => {
     p_tool_password: $("fieldToolPassword").value.trim() || null,
     p_is_internal_only: $("fieldInternal").checked,
     p_is_client_safe: $("fieldClientSafe").checked,
+    p_is_client_specific: $("fieldClientSpecific").checked,
     p_keywords: currentKeywords
   };
 
