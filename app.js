@@ -119,7 +119,7 @@
       $("browseAllFooterLabel").textContent = "Browse All Tools";
     } else {
       $("heroTitle").textContent = "FIND THE RIGHT COACHING RESPONSE";
-      $("heroSubtitle").innerHTML = "Search approved TradesFormation coaching responses, copy the answer, and get back to coaching.";
+      $("heroSubtitle").innerHTML = "Search approved TradesFormation coaching responses and copy the response you need.";
       $("searchInput").placeholder = "Search coaching responses…";
       $("emptyStateText").textContent = "No coaching responses match that search.";
       $("browseAllFooterLabel").textContent = "Browse All Coaching Responses";
