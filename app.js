@@ -284,28 +284,53 @@
     renderCurrent();
   });
 
+  let pendingCopyButton = null;
+  let toastTimer = null;
+  function showToast(message) {
+    const toast = $("copyToast");
+    toast.textContent = message;
+    toast.hidden = false;
+    requestAnimationFrame(() => toast.classList.add("toast--show"));
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("toast--show");
+      setTimeout(() => { toast.hidden = true; }, 250);
+    }, 3000);
+  }
+  // Runs after Yes, No or clicking outside the popup: the response is already on the clipboard either way.
+  function finishCopy(message) {
+    $("usageOverlay").hidden = true;
+    pendingUsageId = null;
+    const button = pendingCopyButton;
+    pendingCopyButton = null;
+    if (button && document.body.contains(button)) {
+      button.textContent = "Copied ✓";
+      button.classList.add("copy-success");
+      setTimeout(() => { button.textContent = "Copy Response"; button.classList.remove("copy-success"); }, 2500);
+    }
+    showToast(message);
+  }
+
   async function copyCoachingResponse(id, button) {
     const item = allCoaching.find(x => x.id === id);
     if (!item) return;
     try {
       await navigator.clipboard.writeText(item.response);
-      const original = button.textContent;
-      button.textContent = "Copied ✓";
-      button.classList.add("copy-success");
-      setTimeout(() => { button.textContent = original; button.classList.remove("copy-success"); }, 1400);
       pendingUsageId = id;
+      pendingCopyButton = button;
       $("usageOverlay").hidden = false;
     } catch (err) {
       alert("Couldn't copy that response. Please try again.");
     }
   }
 
-  $("usageNoBtn").addEventListener("click", () => { pendingUsageId = null; $("usageOverlay").hidden = true; });
-  $("usageOverlay").addEventListener("click", e => { if (e.target.id === "usageOverlay") { pendingUsageId = null; $("usageOverlay").hidden = true; } });
+  $("usageNoBtn").addEventListener("click", () => finishCopy("✓ Copied — ready to paste"));
+  $("usageOverlay").addEventListener("click", e => { if (e.target.id === "usageOverlay") finishCopy("✓ Copied — ready to paste"); });
   $("usageYesBtn").addEventListener("click", async () => {
     if (!pendingUsageId) return;
     const id = pendingUsageId;
     $("usageYesBtn").disabled = true;
+    let message = "✓ Copied — ready to paste. Use recorded.";
     try {
       const result = await coachingApi("increment", { id });
       const item = allCoaching.find(x => x.id === id);
@@ -314,10 +339,10 @@
       if (label) label.textContent = `Used ${result.usage_count} time${result.usage_count === 1 ? "" : "s"}`;
     } catch (err) {
       console.error("Could not record coaching usage:", err);
+      message = "✓ Copied — ready to paste. (Couldn't record the use this time.)";
     } finally {
       $("usageYesBtn").disabled = false;
-      pendingUsageId = null;
-      $("usageOverlay").hidden = true;
+      finishCopy(message);
     }
   });
 
