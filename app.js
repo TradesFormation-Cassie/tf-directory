@@ -113,13 +113,13 @@
 
     if (mode === "tools") {
       $("heroTitle").textContent = "FIND THE RIGHT TF TOOL";
-      $("heroSubtitle").innerHTML = "Every Netlify-hosted tool, guide, and app built by and for<br>TradesFormation, all in one place.";
+      $("heroSubtitle").innerHTML = "Every Netlify-hosted tool, guide, and app built by and for <br>TradesFormation, all in one place.";
       $("searchInput").placeholder = "Search resources…";
       $("emptyStateText").textContent = "No resources match that search.";
       $("browseAllFooterLabel").textContent = "Browse All Tools";
     } else {
       $("heroTitle").textContent = "FIND THE RIGHT COACHING RESPONSE";
-      $("heroSubtitle").innerHTML = "Search approved TradesFormation coaching responses, copy the answer,<br>and get back to coaching.";
+      $("heroSubtitle").innerHTML = "Search approved TradesFormation coaching responses, copy the answer, and get back to coaching.";
       $("searchInput").placeholder = "Search coaching responses…";
       $("emptyStateText").textContent = "No coaching responses match that search.";
       $("browseAllFooterLabel").textContent = "Browse All Coaching Responses";
