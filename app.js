@@ -124,6 +124,8 @@
       $("emptyStateText").textContent = "No coaching responses match that search.";
       $("browseAllFooterLabel").textContent = "Browse All Coaching Responses";
     }
+    $("heroEyebrow").hidden = mode === "coaching";
+    $("heroSubtitle").classList.toggle("hero__subtitle--coaching", mode === "coaching");
     renderSuggestedTerms();
     updateGodModeUI();
     renderCurrent();
